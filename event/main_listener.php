@@ -24,7 +24,8 @@ class main_listener implements EventSubscriberInterface
 	{
 		return array(
 			'core.user_setup'							=> 'load_language_on_setup',
-			'core.acp_email_modify_sql'					=> 'add_criteria_fields'
+			'core.acp_email_modify_sql'					=> 'add_criteria_fields',
+			'core.acp_email_display'					=> 'add_template_variables',
 		);
 	}
 
@@ -43,6 +44,9 @@ class main_listener implements EventSubscriberInterface
 	/** @var \phpbb\request\request */
 	private $request;
 
+	/** @var \phpbb\db\driver\factory */
+	protected $db;
+
 	/**
 	 * Constructor
 	 *
@@ -51,15 +55,17 @@ class main_listener implements EventSubscriberInterface
 	 * @param \phpbb\template\template	$template	Template object
 	 * @param string                    $php_ext    phpEx
 	 * @param \phpbb\request\request	$request	Request object
+	 * @param \phpbb\db\driver\factory 	$db 		The database factory object
 	 */
 
-	public function __construct(\phpbb\language\language $language, \phpbb\controller\helper $helper, \phpbb\template\template $template, $php_ext, \phpbb\request\request $request)
+	public function __construct(\phpbb\language\language $language, \phpbb\controller\helper $helper, \phpbb\template\template $template, $php_ext, \phpbb\request\request $request, \phpbb\db\driver\factory $db)
 	{
 		$this->language = $language;
 		$this->helper   = $helper;
 		$this->template = $template;
 		$this->php_ext  = $php_ext;
 		$this->request	= $request;
+		$this->db		= $db;
 	}
 
 	/**
@@ -78,63 +84,106 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
+	 * Modify custom email template data before we display the form
+	 *
+	 * @event core.acp_email_display
+	 * @var	array	template_data		Array with template data assigned to email template
+	 * @var	array	exclude				Array with groups which are excluded from group selection
+	 * @var	array	usernames			Usernames which will be displayed in form
+	 *
+	 * @since 3.1.4-RC1
+	 */
+	public function add_template_variables($event)
+	{
+
+		// Hook in the CSS and Javascript files used by the extension
+		$template_data = $event['template_data'];
+		$template_data['S_INCLUDE_SME_CSS'] = true;
+		$template_data['S_INCLUDE_SME_JS'] = true;
+
+		// Add ranks
+
+		$sql_ary = array(
+			'SELECT'	=>	'*',
+			'FROM' 		=> array(RANKS_TABLE => 'r')
+		);
+
+		$sql = $this->db->sql_build_query('SELECT', $sql_ary);
+		$result = $this->db->sql_query($sql);
+		$rank_options = '';
+		$ranks_found = 0;
+
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			$rank_options .= '<option value="' . $row['rank_id'] . '">' . $row['rank_title'] . '</option>';
+			$ranks_found++;
+		}
+
+		$template_data['RANK_OPTIONS'] = $rank_options;
+		$this->db->sql_freeresult($result); // Query be gone!
+
+		$template_data['S_SHOW_RANKS'] = ($ranks_found > 0) ? 1 : 0;
+		$template_data['RANK_SIZE'] = min(5, $ranks_found);	// Set size of the ranks select control
+
+		$event['template_data'] = $template_data;
+
+	}
+
+	/**
 	 * Modify sql query to change the list of users the email is sent to
 	 *
 	 * @event core.acp_email_modify_sql
 	 * @var	array	sql_ary		Array which is used to build the sql query
 	 * @since 3.1.2-RC1
 	 */
-
 	public function add_criteria_fields($event)
 	{
 
+		static $operators = array('lt' => '< ', 'le' => '<= ', 'eq' => '= ', 'ne' => '<> ', 'ge' => '>= ', 'gt' => '> ');
+
 		$sql_ary = $event['sql_ary'];
 
-		// Get the criteria variables from the screen.
-		$inactive = $this->request->variable('inactive', '');
-		$lastpost_after = $this->request->variable('lastpost_after', '', true);
-		$lastpost_before = $this->request->variable('lastpost_before', '', true);
-		$lastvisit_after = $this->request->variable('lastvisit_after', '', true);
-		$lastvisit_before = $this->request->variable('lastvisit_before', '', true);
-		$posts_fewer = $this->request->variable('posts_fewer', 0);
-		$posts_more = $this->request->variable('posts_more', 0);
-		$unread_privmsg = $this->request->variable('unread_privmsg', 0, true);
+		// Get the criteria variables from the form
+		$inactive 				= $this->request->variable('inactive', '');
+		$lastpost 				= $this->request->variable('lastpost', '', true);
+		$lastpost_comparison 	= $this->request->variable('lastpost_comparison', '');
+		$lastvisit 				= $this->request->variable('lastvisit', '', true);
+		$lastvisit_comparison 	= $this->request->variable('lastvisit_comparison', '');
+		$posts 					= $this->request->variable('posts', 0);
+		$posts_comparison 		= $this->request->variable('posts_comparison', '');
+		$ranks 					= $this->request->variable('ranks', array('' => 0));
+		$unread_pm_comparison 	= $this->request->variable('unread_pm_comparison', '');
+		$unread_privmsg 		= $this->request->variable('unread_privmsg', 0, true);
 
-		// Add applicable criteria to the SQL query
-		if ($posts_fewer > 0)
+		// Add the applicable criteria to the SQL query, but only if specified
+
+		if ($posts > 0)
 		{
-			$sql_ary['WHERE'] .= ' AND user_posts <= ' . $posts_fewer;
+			$sql_ary['WHERE'] .= ' AND u.user_posts ' . $operators[$posts_comparison] . $posts;
 		}
-		if ($posts_more > 0)
+		if ($lastvisit != '')
 		{
-			$sql_ary['WHERE'] .= ' AND user_posts >= ' . $posts_more;
-		}
-		if ($lastvisit_before != '')
-		{
-			$sql_ary['WHERE'] .= ' AND user_lastvisit <= ' . strtotime($lastvisit_before);
-		}
-		if ($lastvisit_after != '')
-		{
-			$sql_ary['WHERE'] .= ' AND user_lastvisit >= ' . strtotime($lastvisit_after);
+			$sql_ary['WHERE'] .= ' AND u.user_lastvisit ' . $operators[$lastvisit_comparison] . strtotime($lastvisit);
 		}
 		if ($inactive == 'on')
 		{
-			$sql_ary['WHERE'] .= ' AND user_type = ' . USER_INACTIVE;
+			$sql_ary['WHERE'] = str_replace('u.user_type IN (' . USER_NORMAL . ', ' . USER_FOUNDER . ')', 'u.user_type = ' . USER_INACTIVE, $sql_ary['WHERE']);
 		}
-		if ($lastpost_before != '')
+		if ($lastpost != '')
 		{
-			$sql_ary['WHERE'] .= ' AND user_lastpost_time <= ' . strtotime($lastpost_before);
-		}
-		if ($lastpost_after != '')
-		{
-			$sql_ary['WHERE'] .= ' AND user_lastpost_time >= ' . strtotime($lastpost_after);
+			$sql_ary['WHERE'] .= ' AND u.user_lastpost_time ' . $operators[$lastpost_comparison] . strtotime($lastpost);
 		}
 		if ($unread_privmsg > 0)
 		{
-			$sql_ary['WHERE'] .= ' AND user_unread_privmsg >= ' . $unread_privmsg;
+			$sql_ary['WHERE'] .= ' AND u.user_unread_privmsg ' . $operators[$unread_pm_comparison] . $unread_privmsg;
+		}
+		if (count($ranks) > 0)
+		{
+			$sql_ary['WHERE'] .= ' AND '. $this->db->sql_in_set('user_rank', $ranks);
 		}
 
 		$event['sql_ary'] = $sql_ary;
 
 	}
+
 }

@@ -1,33 +1,68 @@
 	</dl>
-	<p style="width:45%;">{{ lang('CRITERIA_INTRODUCTION') }}</p>
+	<p style="width:45%;">{{ lang('SME_CRITERIA_INTRODUCTION') }}</p>
 	<dl>
-		<dt><label for="posts_fewer">{{ lang('FEWER_POSTS') }}{{ lang('COLON') }}</label><br /><span>{{ lang('FEWER_POSTS_EXPLAIN') }}</span></dt>
-		<dd><input id="posts_fewer" name="posts_fewer" type="number" min="1"></dd>
-	</dl>
-	<dl>
-		<dt><label for="posts_more">{{ lang('MORE_POSTS') }}{{ lang('COLON') }}</label><br /><span>{{ lang('MORE_POSTS_EXPLAIN') }}</span></dt>
-		<dd><input id="posts_more" name="posts_more" type="number" min="1"></dd>
-	</dl>
-	<dl>
-		<dt><label for="lastvisit_before">{{ lang('LASTVISIT_BEFORE') }}{{ lang('COLON') }}</label><br /><span>{{ lang('LASTVISIT_BEFORE_EXPLAIN') }}</span></dt>
-		<dd><input id="lastvisit_before" name="lastvisit_before" type="text" placeholder="YYYY-MM-DD" size="10" maxlength="10"></dd>
-	</dl>
-	<dl>
-		<dt><label for="lastvisit_after">{{ lang('LASTVISIT_AFTER') }}{{ lang('COLON') }}</label><br /><span>{{ lang('LASTVISIT_AFTER_EXPLAIN') }}</span></dt>
-		<dd><input id="lastvisit_after" name="lastvisit_after" type="text" placeholder="YYYY-MM-DD" size="10" maxlength="10"></dd>
-	</dl>
-	<dl>
-		<dt><label for="inactive">{{ lang('INACTIVE') }}{{ lang('COLON') }}</label><br /><span>{{ lang('INACTIVE_EXPLAIN') }}</span></dt>
+		<dt><label for="inactive">{{ lang('INACTIVE') }}{{ lang('COLON') }}</label><br /><span>{{ lang('SME_INACTIVE_EXPLAIN') }}</span></dt>
 		<dd><input id="inactive" name="inactive" type="checkbox" value="on"></dd>
 	</dl>
+	{% if S_SHOW_RANKS %}
 	<dl>
-		<dt><label for="lastpost_before">{{ lang('LAST_POST_BEFORE') }}{{ lang('COLON') }}</label><br /><span>{{ lang('LAST_POST_BEFORE_EXPLAIN') }}</span></dt>
-		<dd><input id="lastpost_before" name="lastpost_before" type="text" placeholder="YYYY-MM-DD" size="10" maxlength="10"></dd>
+		<dt><label for="ranks">{{ lang('SME_RANKS') }}{{ lang('COLON') }}</label><br /><span>{{ lang('SME_RANKS_EXPLAIN') }}</span></dt>
+		<dd>
+			<select id="ranks" name="ranks[]" multiple size="{{ RANK_SIZE }}">
+				{{ RANK_OPTIONS }}
+			</select><br><br>
+			<button id="unselect_options" type="button">{{ lang('SME_UNSELECT_RANKS') }}</button>
+		</dd>
+	</dl>
+	{% endif %}
+	<dl>
+		<dt><label for="posts">{{ lang('POSTS') }}{{ lang('COLON') }}</label><br /><span>{{ lang('SME_POSTS_EXPLAIN') }}</span></dt>
+		<dd>
+			<select id="posts_comparison" name="posts_comparison">
+				<option value="lt">{{ lang('SME_LESS_THAN') }}</option>
+				<option value="le">{{ lang('SME_LESS_THAN_OR_EQUAL_TO') }}</option>
+				<option value="eq">{{ lang('SME_EQUAL_TO') }}</option>
+				<option value="ne">{{ lang('SME_NOT_EQUAL_TO') }}</option>
+				<option value="ge">{{ lang('SME_GREATER_THAN_OR_EQUAL_TO') }}</option>
+				<option value="gt">{{ lang('SME_GREATER_THAN') }}</option>
+			</select>
+			<input id="posts" name="posts" type="number" min="0">
+		</dd>
 	</dl>
 	<dl>
-		<dt><label for="lastpost_after">{{ lang('LAST_POST_AFTER') }}{{ lang('COLON') }}</label><br /><span>{{ lang('LAST_POST_AFTER_EXPLAIN') }}</span></dt>
-		<dd><input id="lastpost_after" name="lastpost_after" type="text" placeholder="YYYY-MM-DD" size="10" maxlength="10"></dd>
+		<dt><label for="lastvisit">{{ lang('SME_LASTVISIT') }}{{ lang('COLON') }}</label><br /><span>{{ lang('SME_LASTVISIT_EXPLAIN') }}</span></dt>
+		<dd>
+			<select id="lastvisit_comparison" name="lastvisit_comparison">
+				<option value="lt">{{ lang('SME_LESS_THAN') }}</option>
+				<option value="le">{{ lang('SME_LESS_THAN_OR_EQUAL_TO') }}</option>
+				<option value="ge">{{ lang('SME_GREATER_THAN_OR_EQUAL_TO') }}</option>
+				<option value="gt">{{ lang('SME_GREATER_THAN') }}</option>
+			</select>
+			<input id="lastvisit" name="lastvisit" type="text" placeholder="YYYY-MM-DD" size="10" maxlength="10" readonly>
+		</dd>
 	</dl>
 	<dl>
-		<dt><label for="unread_privmsg">{{ lang('UNREAD_PRIVATE_MESSAGES') }}{{ lang('COLON') }}</label><br /><span>{{ lang('UNREAD_PRIVATE_MESSAGES_EXPLAIN') }}</span></dt>
-		<dd><input id="unread_privmsg" name="unread_privmsg" type="number" min="1"></dd>
+		<dt><label for="lastpost">{{ lang('SME_LASTPOST') }}{{ lang('COLON') }}</label><br /><span>{{ lang('SME_LASTPOST_EXPLAIN') }}</span></dt>
+		<dd>
+			<select id="lastpost_comparison" name="lastpost_comparison">
+				<option value="lt">{{ lang('SME_LESS_THAN') }}</option>
+				<option value="le">{{ lang('SME_LESS_THAN_OR_EQUAL_TO') }}</option>
+				<option value="ge">{{ lang('SME_GREATER_THAN_OR_EQUAL_TO') }}</option>
+				<option value="gt">{{ lang('SME_GREATER_THAN') }}</option>
+			</select>
+			<input id="lastpost" name="lastpost" type="text" placeholder="YYYY-MM-DD" size="10" maxlength="10" readonly>
+		</dd>
+	</dl>
+	<dl>
+		<dt><label for="unread_privmsg">{{ lang('SME_UNREAD_PRIVATE_MESSAGES') }}{{ lang('COLON') }}</label><br /><span>{{ lang('SME_UNREAD_PRIVATE_MESSAGES_EXPLAIN') }}</span></dt>
+		<dd>
+			<select id="unread_pm_comparison" name="unread_pm_comparison">
+				<option value="lt">{{ lang('SME_LESS_THAN') }}</option>
+				<option value="le">{{ lang('SME_LESS_THAN_OR_EQUAL_TO') }}</option>
+				<option value="eq">{{ lang('SME_EQUAL_TO') }}</option>
+				<option value="ne">{{ lang('SME_NOT_EQUAL_TO') }}</option>
+				<option value="ge">{{ lang('SME_GREATER_THAN_OR_EQUAL_TO') }}</option>
+				<option value="gt">{{ lang('SME_GREATER_THAN') }}</option>
+			</select>
+			<input id="unread_privmsg" name="unread_privmsg" type="number" min="0">
+		</dd>

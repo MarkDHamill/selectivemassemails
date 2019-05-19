@@ -1,0 +1,15 @@
+{% if S_INCLUDE_SME_CSS %}
+	{# Includes ACP - CSS #}
+	{% if not definition.INCLUDE_SMECSS %}
+		{% INCLUDECSS '@phpbbservices_selectivemassemails/acp_selectivemassemails.css' %}
+		{% INCLUDECSS '@phpbbservices_selectivemassemails/jquery-ui-1.12.1.min.css' %}
+		{% DEFINE INCLUDE_SMECSS = true %}
+	{% endif %}
+{% endif %}
+{% if S_INCLUDE_SME_JS %}
+{# Includes ACP - JS #}
+	{% if not definition.INCLUDED_SMEJS %}
+		{% INCLUDEJS '@phpbbservices_selectivemassemails/jquery-ui-1.12.1.min.js' %}
+		{% DEFINE INCLUDED_SMEJS = true %}
+	{% endif %}
+{% endif %}

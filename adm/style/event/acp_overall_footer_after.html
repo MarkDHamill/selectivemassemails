@@ -1,0 +1,17 @@
+{# Includes ACP - JS #}
+{% if definition.INCLUDED_SMEJS %}
+<script>
+	$( function() {
+		$("#lastvisit, #lastpost").datepicker({
+			dateFormat: 'yy-mm-dd',
+			changeYear: true
+		});
+	} );
+	// When reset button is pressed, this logic will unselect all ranks
+	$("#unselect_options").click(function() {
+		$("#ranks option").each(function() {
+			$(this).prop('selected', false);
+		});
+	});
+</script>
+{% endif %}

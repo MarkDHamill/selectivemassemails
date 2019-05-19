@@ -8,5 +8,6 @@ services:
             - '@template'
             - '%core.php_ext%'
             - '@request'
+            - '@dbal.conn'
         tags:
             - { name: event.listener }
