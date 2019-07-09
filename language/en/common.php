@@ -36,7 +36,7 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, array(
 
-	'SME_CRITERIA_INTRODUCTION'				=> 'Specifying criteria in the following fields will logically AND the results with the group selected. The more criteria specified, the fewer emails are sent. <em>If the combination of criteria results in no users selected, you will see a message saying the requested user does not exist</em>.',
+	'SME_CRITERIA_INTRODUCTION'				=> 'Specifying additional criteria in the following fields will logically AND the results with the group selected. The more criteria specified, the fewer emails are sent. <em>If the combination of criteria results in no users selected, you will see a message saying the requested user does not exist</em>.',
 	'SME_EQUAL_TO' 							=> '== (Equal to)',
 	'SME_GREATER_THAN' 						=> '> (Greater than)',
 	'SME_GREATER_THAN_OR_EQUAL_TO' 			=> '>= (Greater than or equal to)',
