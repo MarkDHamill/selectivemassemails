@@ -1,3 +1,0 @@
-phpbbservices_selectivemassemails_controller:
-    path: /demo/{name}
-    defaults: { _controller: phpbbservices.selectivemassemails.controller.main:handle }

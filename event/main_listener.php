@@ -29,33 +29,22 @@ class main_listener implements EventSubscriberInterface
 		);
 	}
 
-	/* @var \phpbb\language\language */
-	protected $language;
-
-	/* @var \phpbb\controller\helper */
-	protected $helper;
-
-	/* @var \phpbb\template\template */
-	protected $template;
-
-	/** @var string phpEx */
-	protected $php_ext;
-
-	/** @var \phpbb\request\request */
-	private $request;
-
-	/** @var \phpbb\db\driver\factory */
 	protected $db;
+	protected $helper;
+	protected $language;
+	protected $php_ext;
+	protected $request;
+	protected $template;
 
 	/**
 	 * Constructor
 	 *
-	 * @param \phpbb\language\language	$language	Language object
-	 * @param \phpbb\controller\helper	$helper		Controller helper object
-	 * @param \phpbb\template\template	$template	Template object
-	 * @param string                    $php_ext    phpEx
-	 * @param \phpbb\request\request	$request	Request object
-	 * @param \phpbb\db\driver\factory 	$db 		The database factory object
+	 * @param \phpbb\language\language	$language		Language object
+	 * @param \phpbb\controller\helper	$helper			Controller helper object
+	 * @param \phpbb\template\template	$template		Template object
+	 * @param string                    $php_ext    	phpEx
+	 * @param \phpbb\request\request	$request		Request object
+	 * @param \phpbb\db\driver\factory 	$db 			The database factory object
 	 */
 
 	public function __construct(\phpbb\language\language $language, \phpbb\controller\helper $helper, \phpbb\template\template $template, $php_ext, \phpbb\request\request $request, \phpbb\db\driver\factory $db)
@@ -122,7 +111,7 @@ class main_listener implements EventSubscriberInterface
 		$template_data['RANK_OPTIONS'] = $rank_options;
 		$this->db->sql_freeresult($result); // Query be gone!
 
-		$template_data['S_SHOW_RANKS'] = ($ranks_found > 0) ? 1 : 0;
+		$template_data['S_SHOW_RANKS'] = ($ranks_found > 0) ? true : false;
 		$template_data['RANK_SIZE'] = min(5, $ranks_found);	// Set size of the ranks select control
 
 		$event['template_data'] = $template_data;
@@ -144,16 +133,16 @@ class main_listener implements EventSubscriberInterface
 		$sql_ary = $event['sql_ary'];
 
 		// Get the criteria variables from the form
-		$inactive 				= $this->request->variable('inactive', '');
-		$lastpost 				= $this->request->variable('lastpost', '', true);
-		$lastpost_comparison 	= $this->request->variable('lastpost_comparison', '');
-		$lastvisit 				= $this->request->variable('lastvisit', '', true);
-		$lastvisit_comparison 	= $this->request->variable('lastvisit_comparison', '');
-		$posts 					= $this->request->variable('posts', 0);
-		$posts_comparison 		= $this->request->variable('posts_comparison', '');
-		$ranks 					= $this->request->variable('ranks', array('' => 0));
-		$unread_pm_comparison 	= $this->request->variable('unread_pm_comparison', '');
-		$unread_privmsg 		= $this->request->variable('unread_privmsg', 0, true);
+		$inactive = $this->request->variable('inactive', '');
+		$lastpost = $this->request->variable('lastpost', '', true);
+		$lastpost_comparison = $this->request->variable('lastpost_comparison', '');
+		$lastvisit = $this->request->variable('lastvisit', '', true);
+		$lastvisit_comparison = $this->request->variable('lastvisit_comparison', '');
+		$posts = $this->request->variable('posts', 0);
+		$posts_comparison = $this->request->variable('posts_comparison', '');
+		$ranks = $this->request->variable('ranks', array('' => 0));
+		$unread_pm_comparison = $this->request->variable('unread_pm_comparison', '');
+		$unread_privmsg = $this->request->variable('unread_privmsg', 0, true);
 
 		// Add the applicable criteria to the SQL query, but only if specified
 
@@ -179,7 +168,7 @@ class main_listener implements EventSubscriberInterface
 		}
 		if (count($ranks) > 0)
 		{
-			$sql_ary['WHERE'] .= ' AND '. $this->db->sql_in_set('user_rank', $ranks);
+			$sql_ary['WHERE'] .= ' AND ' . $this->db->sql_in_set('user_rank', $ranks);
 		}
 
 		$event['sql_ary'] = $sql_ary;

@@ -2,9 +2,11 @@
 
 ## Installation
 
-Copy the extension to phpBB/ext/phpbbservices/selectivemassemails
+Upload the extension's files and folders to /ext
 
-Go to "ACP" > "Customise" > "Extensions" and enable the "Selective mass emails" extension.
+The extension will create a phpbbservices/selectivemassemail folder in this folder.
+
+Then go to "ACP" > "Customise" > "Extensions" and enable the "Selective mass emails" extension.
 
 ## License
 
