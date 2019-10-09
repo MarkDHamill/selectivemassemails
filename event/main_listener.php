@@ -30,29 +30,17 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	protected $db;
-	protected $helper;
-	protected $language;
-	protected $php_ext;
-	protected $request;
 	protected $template;
 
 	/**
 	 * Constructor
 	 *
-	 * @param \phpbb\language\language	$language		Language object
-	 * @param \phpbb\controller\helper	$helper			Controller helper object
-	 * @param \phpbb\template\template	$template		Template object
-	 * @param string                    $php_ext    	phpEx
 	 * @param \phpbb\request\request	$request		Request object
 	 * @param \phpbb\db\driver\factory 	$db 			The database factory object
 	 */
 
-	public function __construct(\phpbb\language\language $language, \phpbb\controller\helper $helper, \phpbb\template\template $template, $php_ext, \phpbb\request\request $request, \phpbb\db\driver\factory $db)
+	public function __construct(\phpbb\request\request $request, \phpbb\db\driver\factory $db)
 	{
-		$this->language = $language;
-		$this->helper   = $helper;
-		$this->template = $template;
-		$this->php_ext  = $php_ext;
 		$this->request	= $request;
 		$this->db		= $db;
 	}
@@ -64,12 +52,17 @@ class main_listener implements EventSubscriberInterface
 	 */
 	public function load_language_on_setup($event)
 	{
-		$lang_set_ext = $event['lang_set_ext'];
-		$lang_set_ext[] = array(
-			'ext_name' => 'phpbbservices/selectivemassemails',
-			'lang_set' => 'common',
-		);
-		$event['lang_set_ext'] = $lang_set_ext;
+		// Load only if in the ACP mass email program.
+		$url = $this->request->server('REQUEST_URI');
+		if (stristr($url, "i=acp_email"))
+		{
+			$lang_set_ext = $event['lang_set_ext'];
+			$lang_set_ext[] = array(
+				'ext_name' => 'phpbbservices/selectivemassemails',
+				'lang_set' => 'common',
+			);
+			$event['lang_set_ext'] = $lang_set_ext;
+		}
 	}
 
 	/**
@@ -91,7 +84,6 @@ class main_listener implements EventSubscriberInterface
 		$template_data['S_INCLUDE_SME_JS'] = true;
 
 		// Add ranks
-
 		$sql_ary = array(
 			'SELECT'	=>	'*',
 			'FROM' 		=> array(RANKS_TABLE => 'r')
@@ -140,9 +132,11 @@ class main_listener implements EventSubscriberInterface
 		$lastvisit_comparison = $this->request->variable('lastvisit_comparison', '');
 		$posts = $this->request->variable('posts', 0);
 		$posts_comparison = $this->request->variable('posts_comparison', '');
+		$posts_unapproved = $this->request->variable('posts_unapproved', 0);
+		$posts_unapproved_comparison = $this->request->variable('posts_unapproved_comparison', '');
 		$ranks = $this->request->variable('ranks', array('' => 0));
 		$unread_pm_comparison = $this->request->variable('unread_pm_comparison', '');
-		$unread_privmsg = $this->request->variable('unread_privmsg', 0, true);
+		$unread_privmsg = $this->request->variable('unread_privmsg', 0);
 
 		// Add the applicable criteria to the SQL query, but only if specified
 
@@ -150,13 +144,86 @@ class main_listener implements EventSubscriberInterface
 		{
 			$sql_ary['WHERE'] .= ' AND u.user_posts ' . $operators[$posts_comparison] . $posts;
 		}
+
+		if ($posts_unapproved > 0)
+		{
+
+			// Infer type of query:
+			//		usernames - a list of usernames are supplied, so any groups specified is not used
+			//		group - a group is specified (but not everyone)
+			//		all - goes to all users because no group is specified and no usernames were supplied
+			if ($this->request->variable('usernames', '') !== '')
+			{
+				$sql_type = 'usernames';
+			}
+			else if ($this->request->variable('g', 0) !== 0)
+			{
+				$sql_type = 'group';
+			}
+			else
+			{
+				$sql_type = 'all';
+			}
+
+			$sql_ary['SELECT'] .= ', p.poster_id, count(*)';
+			$sql_ary['GROUP_BY'] = 'username, username_clean, user_email, user_jabber, user_lang, user_notify_type, p.poster_id HAVING count(*) ' . $operators[$posts_unapproved_comparison] . $posts_unapproved;
+
+			switch ($sql_type)
+			{
+				case 'group':
+					$sql_ary['WHERE'] .= ' AND post_visibility = 1';
+					$sql_ary['LEFT_JOIN'] = array(
+						array(
+							'FROM' => array(POSTS_TABLE => 'p'),
+							'ON'   => 'p.poster_id = u.user_id',
+						),
+						array(
+							'FROM' => array(BANLIST_TABLE => 'b'),
+							'ON'   => 'b.ban_id = u.user_id',
+						),
+					);
+				break;
+
+				case 'all':
+				default:
+					$sql_ary['WHERE'] = 'post_visibility = 1';
+					$sql_ary['LEFT_JOIN'] = array(
+						array(
+							'FROM' => array(POSTS_TABLE => 'p'),
+							'ON'   => 'p.poster_id = user_id',
+						),
+						array(
+							'FROM' => array(BANLIST_TABLE => 'b'),
+							'ON'   => 'b.ban_id = user_id',
+						),
+					);
+				break;
+
+				case 'usernames':
+					$sql_ary['WHERE'] .= ' AND post_visibility = 1';
+					$sql_ary['LEFT_JOIN'] = array(
+						array(
+							'FROM' => array(POSTS_TABLE => 'p'),
+							'ON'   => 'p.poster_id = user_id',
+						),
+						array(
+							'FROM' => array(BANLIST_TABLE => 'b'),
+							'ON'   => 'b.ban_id = user_id',
+						),
+					);
+				break;
+
+			}
+
+		}
+
 		if ($lastvisit != '')
 		{
 			$sql_ary['WHERE'] .= ' AND u.user_lastvisit ' . $operators[$lastvisit_comparison] . strtotime($lastvisit);
 		}
 		if ($inactive == 'on')
 		{
-			$sql_ary['WHERE'] = str_replace('u.user_type IN (' . USER_NORMAL . ', ' . USER_FOUNDER . ')', 'u.user_type = ' . USER_INACTIVE, $sql_ary['WHERE']);
+			$sql_ary['WHERE'] .= ' AND ' . $this->db->sql_in_set(user_type, USER_INACTIVE);
 		}
 		if ($lastpost != '')
 		{

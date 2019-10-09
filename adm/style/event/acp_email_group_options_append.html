@@ -1,5 +1,10 @@
 	</dl>
-	<p style="width:45%;">{{ lang('SME_CRITERIA_INTRODUCTION') }}</p>
+	<dl>
+		<dt>
+			{{ lang('SME_CRITERIA_INTRODUCTION') }}
+		</dt>
+		<dd> </dd>
+	</dl>
 	<dl>
 		<dt><label for="inactive">{{ lang('INACTIVE') }}{{ lang('COLON') }}</label><br /><span>{{ lang('SME_INACTIVE_EXPLAIN') }}</span></dt>
 		<dd><input id="inactive" name="inactive" type="checkbox" value="on"></dd>
@@ -27,6 +32,20 @@
 				<option value="gt">{{ lang('SME_GREATER_THAN') }}</option>
 			</select>
 			<input id="posts" name="posts" type="number" min="0">
+		</dd>
+	</dl>
+	<dl>
+		<dt><label for="posts_unapproved">{{ lang('SME_UNAPPROVED_POSTS') }}{{ lang('COLON') }}</label><br /><span>{{ lang('SME_UNAPPROVED_POSTS_EXPLAIN') }}</span></dt>
+		<dd>
+			<select id="posts_unapproved_comparison" name="posts_unapproved_comparison">
+				<option value="lt">{{ lang('SME_LESS_THAN') }}</option>
+				<option value="le">{{ lang('SME_LESS_THAN_OR_EQUAL_TO') }}</option>
+				<option value="eq">{{ lang('SME_EQUAL_TO') }}</option>
+				<option value="ne">{{ lang('SME_NOT_EQUAL_TO') }}</option>
+				<option value="ge" selected="selected">{{ lang('SME_GREATER_THAN_OR_EQUAL_TO') }}</option>
+				<option value="gt">{{ lang('SME_GREATER_THAN') }}</option>
+			</select>
+			<input id="posts_unapproved" name="posts_unapproved" type="number" min="0">
 		</dd>
 	</dl>
 	<dl>

@@ -36,10 +36,10 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, array(
 
-	'SME_CRITERIA_INTRODUCTION'				=> 'Specifying additional criteria in the following fields will logically AND the results with the group selected. The more criteria specified, the fewer emails are sent. <em>If the combination of criteria results in no users selected, you will see a message saying the requested user does not exist</em>.',
+	'SME_CRITERIA_INTRODUCTION'				=> 'Each additional criteria selected should reduce the number of emails sent. <em>If the combination of criteria results in no users selected, you will see a message saying the requested user does not exist</em>.',
 	'SME_EQUAL_TO' 							=> '== (Equal to)',
-	'SME_GREATER_THAN' 						=> '> (Greater than)',
-	'SME_GREATER_THAN_OR_EQUAL_TO' 			=> '>= (Greater than or equal to)',
+	'SME_GREATER_THAN' 						=> '&gt; (Greater than)',
+	'SME_GREATER_THAN_OR_EQUAL_TO' 			=> '&gt;= (Greater than or equal to)',
 	'SME_INACTIVE_EXPLAIN'					=> 'Send group emails to inactive users only within the group specified above.',
 	'SME_LASTPOST'							=> 'Last post',
 	'SME_LASTPOST_EXPLAIN'					=> 'Send group emails to users based on their last post date. Use the date picker to select the date.',
@@ -52,6 +52,8 @@ $lang = array_merge($lang, array(
 	'SME_RANKS'								=> 'Ranks',
 	'SME_RANKS_EXPLAIN'						=> 'You can select more than one rank.',
 	'SME_SELECTED_USERS'					=> 'Selected users',
+	'SME_UNAPPROVED_POSTS'					=> 'Unapproved posts',
+	'SME_UNAPPROVED_POSTS_EXPLAIN'			=> 'Posts waiting in the moderation queue or that are unapproved for other reasons.',
 	'SME_UNREAD_PRIVATE_MESSAGES'			=> 'Unread private messages',
 	'SME_UNREAD_PRIVATE_MESSAGES_EXPLAIN'	=> 'Send group emails to users with whose number of unread private messages meet this criteria.',
 	'SME_UNSELECT_RANKS'					=> 'Unselect all ranks',
