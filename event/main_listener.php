@@ -171,7 +171,7 @@ class main_listener implements EventSubscriberInterface
 			switch ($sql_type)
 			{
 				case 'group':
-					$sql_ary['WHERE'] .= ' AND post_visibility = 1';
+					$sql_ary['WHERE'] .= ' AND post_visibility = 0';
 					$sql_ary['LEFT_JOIN'] = array(
 						array(
 							'FROM' => array(POSTS_TABLE => 'p'),
