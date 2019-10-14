@@ -30,19 +30,22 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	protected $db;
-	protected $template;
+	protected $language;
+	protected $request;
 
 	/**
 	 * Constructor
 	 *
 	 * @param \phpbb\request\request	$request		Request object
 	 * @param \phpbb\db\driver\factory 	$db 			The database factory object
+	 * @param \phpbb\language\language 	$language 		Language object
 	 */
 
-	public function __construct(\phpbb\request\request $request, \phpbb\db\driver\factory $db)
+	public function __construct(\phpbb\request\request $request, \phpbb\db\driver\factory $db, \phpbb\language\language $language)
 	{
 		$this->request	= $request;
 		$this->db		= $db;
+		$this->language	= $language;
 	}
 
 	/**
@@ -56,12 +59,7 @@ class main_listener implements EventSubscriberInterface
 		$url = $this->request->server('REQUEST_URI');
 		if (stristr($url, "i=acp_email"))
 		{
-			$lang_set_ext = $event['lang_set_ext'];
-			$lang_set_ext[] = array(
-				'ext_name' => 'phpbbservices/selectivemassemails',
-				'lang_set' => 'common',
-			);
-			$event['lang_set_ext'] = $lang_set_ext;
+			$this->language->add_lang('common','phpbbservices/selectivemassemails');
 		}
 	}
 
@@ -171,7 +169,7 @@ class main_listener implements EventSubscriberInterface
 			switch ($sql_type)
 			{
 				case 'group':
-					$sql_ary['WHERE'] .= ' AND post_visibility = 0';
+					$sql_ary['WHERE'] .= ' AND post_visibility = ' . ITEM_UNAPPROVED;
 					$sql_ary['LEFT_JOIN'] = array(
 						array(
 							'FROM' => array(POSTS_TABLE => 'p'),
@@ -186,7 +184,7 @@ class main_listener implements EventSubscriberInterface
 
 				case 'all':
 				default:
-					$sql_ary['WHERE'] = 'post_visibility = 1';
+					$sql_ary['WHERE'] = 'post_visibility = ' . ITEM_UNAPPROVED;
 					$sql_ary['LEFT_JOIN'] = array(
 						array(
 							'FROM' => array(POSTS_TABLE => 'p'),
@@ -200,7 +198,7 @@ class main_listener implements EventSubscriberInterface
 				break;
 
 				case 'usernames':
-					$sql_ary['WHERE'] .= ' AND post_visibility = 1';
+					$sql_ary['WHERE'] .= ' AND post_visibility = ' . ITEM_UNAPPROVED;
 					$sql_ary['LEFT_JOIN'] = array(
 						array(
 							'FROM' => array(POSTS_TABLE => 'p'),
@@ -223,7 +221,7 @@ class main_listener implements EventSubscriberInterface
 		}
 		if ($inactive == 'on')
 		{
-			$sql_ary['WHERE'] .= ' AND ' . $this->db->sql_in_set(user_type, USER_INACTIVE);
+			$sql_ary['WHERE'] .= ' AND ' . $this->db->sql_in_set('user_type', USER_INACTIVE);
 		}
 		if ($lastpost != '')
 		{

@@ -3,8 +3,8 @@
     "type": "phpbb-extension",
     "description": "Sends selective mass emails based on various criteria",
     "homepage": "https://www.phpbbservices.com",
-    "version": "1.0.6",
-    "time": "2019-10-10",
+    "version": "1.0.7",
+    "time": "2019-10-14",
     "license": "GPL-2.0-only",
     "authors": [
         {
@@ -25,7 +25,7 @@
         },
         "version-check": {
             "host": "www.phpbbservices.com",
-            "directory": "/other/selectivemassmails/updatecheck/",
+            "directory": "/other/selectivemassemails/updatecheck/",
             "filename": "3.2.json",
             "ssl": true
         }
