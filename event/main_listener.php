@@ -140,7 +140,7 @@ class main_listener implements EventSubscriberInterface
 
 		if ($posts > 0)
 		{
-			$sql_ary['WHERE'] .= ' AND u.user_posts ' . $operators[$posts_comparison] . $posts;
+			$sql_ary['WHERE'] .= ' AND u.user_posts ' . $this->db->sql_escape($operators[$posts_comparison]) . (int) $posts;
 		}
 
 		if ($posts_unapproved > 0)
@@ -217,20 +217,46 @@ class main_listener implements EventSubscriberInterface
 
 		if ($lastvisit != '')
 		{
-			$sql_ary['WHERE'] .= ' AND u.user_lastvisit ' . $operators[$lastvisit_comparison] . strtotime($lastvisit);
+			switch($lastvisit_comparison)
+			{
+				case 'le':
+				case 'gt':
+					// Need to include all timestamps up to 23:59:59 for the date
+					$sql_ary['WHERE'] .= ' AND u.user_lastvisit ' . $this->db->sql_escape($operators[$lastvisit_comparison]) . (int) (strtotime($lastvisit) + (24 * 60 * 60) - 1);
+				break;
+
+				default:
+					$sql_ary['WHERE'] .= ' AND u.user_lastvisit ' . $this->db->sql_escape($operators[$lastvisit_comparison]) . (int) strtotime($lastvisit);
+				break;
+			}
 		}
+
 		if ($inactive == 'on')
 		{
 			$sql_ary['WHERE'] .= ' AND ' . $this->db->sql_in_set('user_type', USER_INACTIVE);
 		}
+
 		if ($lastpost != '')
 		{
-			$sql_ary['WHERE'] .= ' AND u.user_lastpost_time ' . $operators[$lastpost_comparison] . strtotime($lastpost);
+			switch($lastpost_comparison)
+			{
+				case 'le':
+				case 'gt':
+					// Need to include all timestamps up to 23:59:59 for the date
+					$sql_ary['WHERE'] .= ' AND u.user_lastpost_time ' . $this->db->sql_escape($operators[$lastpost_comparison]) . (int) (strtotime($lastpost) + (24 * 60 * 60) - 1);
+				break;
+
+				default:
+					$sql_ary['WHERE'] .= ' AND u.user_lastpost_time ' . $this->db->sql_escape($operators[$lastpost_comparison]) . (int) strtotime($lastpost);
+				break;
+			}
 		}
+
 		if ($unread_privmsg > 0)
 		{
-			$sql_ary['WHERE'] .= ' AND u.user_unread_privmsg ' . $operators[$unread_pm_comparison] . $unread_privmsg;
+			$sql_ary['WHERE'] .= ' AND u.user_unread_privmsg ' . $this->db->sql_escape($operators[$unread_pm_comparison]) . $unread_privmsg;
 		}
+
 		if (count($ranks) > 0)
 		{
 			$sql_ary['WHERE'] .= ' AND ' . $this->db->sql_in_set('user_rank', $ranks);

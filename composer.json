@@ -3,8 +3,8 @@
     "type": "phpbb-extension",
     "description": "Sends selective mass emails based on various criteria",
     "homepage": "https://www.phpbbservices.com",
-    "version": "1.0.7",
-    "time": "2019-10-14",
+    "version": "1.0.8",
+    "time": "2019-10-17",
     "license": "GPL-2.0-only",
     "authors": [
         {
@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": ">=5.4",
+        "php": ">=5.4,<7.3",
         "composer/installers": "~1.0"
     },
     "extra": {
