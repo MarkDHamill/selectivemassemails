@@ -23,7 +23,6 @@ class main_listener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return array(
-			'core.user_setup'							=> 'load_language_on_setup',
 			'core.acp_email_modify_sql'					=> 'add_criteria_fields',
 			'core.acp_email_display'					=> 'add_template_variables',
 		);
@@ -49,21 +48,6 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Load common language files during user setup
-	 *
-	 * @param \phpbb\event\data	$event	Event object
-	 */
-	public function load_language_on_setup($event)
-	{
-		// Load only if in the ACP mass email program.
-		$url = $this->request->server('REQUEST_URI');
-		if (stristr($url, "i=acp_email"))
-		{
-			$this->language->add_lang('common','phpbbservices/selectivemassemails');
-		}
-	}
-
-	/**
 	 * Modify custom email template data before we display the form
 	 *
 	 * @event core.acp_email_display
@@ -75,6 +59,13 @@ class main_listener implements EventSubscriberInterface
 	 */
 	public function add_template_variables($event)
 	{
+
+		// Load only if in the ACP mass email program.
+		$url = $this->request->server('REQUEST_URI');
+		if (stristr($url, "i=acp_email"))
+		{
+			$this->language->add_lang('common','phpbbservices/selectivemassemails');
+		}
 
 		// Hook in the CSS and Javascript files used by the extension
 		$template_data = $event['template_data'];
