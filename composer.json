@@ -3,8 +3,8 @@
     "type": "phpbb-extension",
     "description": "Sends selective mass emails based on various criteria",
     "homepage": "https://www.phpbbservices.com",
-    "version": "1.0.9",
-    "time": "2020-01-25",
+    "version": "1.0.10",
+    "time": "2020-05-10",
     "license": "GPL-2.0-only",
     "authors": [
         {
@@ -21,12 +21,12 @@
     "extra": {
         "display-name": "Selective mass emails",
         "soft-require": {
-            "phpbb/phpbb": ">=3.2.0,<3.3.0@dev"
+            "phpbb/phpbb": ">=3.2.0,<4.0"
         },
         "version-check": {
             "host": "www.phpbbservices.com",
             "directory": "/other/selectivemassemails/updatecheck/",
-            "filename": "3.2.json",
+            "filename": "3.3.json",
             "ssl": true
         }
     }

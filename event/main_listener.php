@@ -60,12 +60,7 @@ class main_listener implements EventSubscriberInterface
 	public function add_template_variables($event)
 	{
 
-		// Load only if in the ACP mass email program.
-		$url = $this->request->server('REQUEST_URI');
-		if (stristr($url, "i=acp_email"))
-		{
-			$this->language->add_lang('common','phpbbservices/selectivemassemails');
-		}
+		$this->language->add_lang('common','phpbbservices/selectivemassemails');
 
 		// Hook in the CSS and Javascript files used by the extension
 		$template_data = $event['template_data'];
