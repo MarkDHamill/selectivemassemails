@@ -48,6 +48,7 @@ $lang = array_merge($lang, array(
 	'SME_LESS_THAN'							=> '&lt; (Less than)',
 	'SME_LESS_THAN_OR_EQUAL_TO' 			=> '&lt;= (Less than or equal to)',
 	'SME_NOT_EQUAL_TO'						=> '!= (Not equal to)',
+	'SME_PLACEHOLDER'						=> 'YYYY-MM-DD',
 	'SME_POSTS_EXPLAIN'						=> 'Send group emails to users whose number of posts meet this criteria.',
 	'SME_RANKS'								=> 'Ranks',
 	'SME_RANKS_EXPLAIN'						=> 'You can select more than one rank.',

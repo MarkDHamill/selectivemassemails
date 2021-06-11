@@ -163,7 +163,7 @@ class main_listener implements EventSubscriberInterface
 						),
 						array(
 							'FROM' => array(BANLIST_TABLE => 'b'),
-							'ON'   => 'b.ban_id = u.user_id',
+							'ON'   => 'b.ban_userid = u.user_id',
 						),
 					);
 				break;
@@ -178,7 +178,7 @@ class main_listener implements EventSubscriberInterface
 						),
 						array(
 							'FROM' => array(BANLIST_TABLE => 'b'),
-							'ON'   => 'b.ban_id = user_id',
+							'ON'   => 'b.ban_userid = user_id',
 						),
 					);
 				break;
@@ -192,7 +192,7 @@ class main_listener implements EventSubscriberInterface
 						),
 						array(
 							'FROM' => array(BANLIST_TABLE => 'b'),
-							'ON'   => 'b.ban_id = user_id',
+							'ON'   => 'b.ban_userid = user_id',
 						),
 					);
 				break;
